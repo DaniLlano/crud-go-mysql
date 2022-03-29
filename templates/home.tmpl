@@ -1,0 +1,25 @@
+{{ define "home" }}
+
+{{ template "header" }}
+<a name="" id="" class="btn btn-primary" href="/create" role="button">Add user</a>
+
+            <table class="table">
+                <thead>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td scope="row">1</td>
+                        <td>Dani</td>
+                        <td>test@test.com</td>
+                        <td>Edit | Delete</td>
+                    </tr>
+                </tbody>
+            </table>
+
+{{ template "footer" }}
+
+{{end}}
