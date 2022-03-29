@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -12,8 +11,8 @@ import (
 
 func conectDB() (connect *sql.DB) {
 	Driver := "mysql"
-	User := "dani"
-	Password := "Rycbar123!"
+	User := ""
+	Password := ""
 	Name := "crud"
 
 	connect, err := sql.Open(Driver, User+":"+Password+"@tcp(127.0.0.1)/"+Name)
@@ -29,6 +28,7 @@ func main() {
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/create", Create)
 	http.HandleFunc("/insert", Insert)
+	http.HandleFunc("/delete", Delete)
 
 	log.Print("Server running")
 	http.ListenAndServe(":8080", nil)
@@ -63,7 +63,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 		newUser = append(newUser, user)
 	}
-	fmt.Println(newUser)
 
 	// fmt.Fprintf(w, "Holi")
 	templates.ExecuteTemplate(w, "home", newUser)
@@ -89,4 +88,18 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 
 	}
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	idUser := r.URL.Query().Get("id")
+
+	connectionEstablished := conectDB()
+	deleteRegister, err := connectionEstablished.Prepare("DELETE FROM users WHERE id=?")
+
+	if err != nil {
+		panic(err.Error())
+	}
+	deleteRegister.Exec(idUser)
+
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
