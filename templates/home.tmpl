@@ -11,12 +11,14 @@
                     <th>Actions</th>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td scope="row">1</td>
-                        <td>Dani</td>
-                        <td>test@test.com</td>
-                        <td>Edit | Delete</td>
-                    </tr>
+                    {{ range. }}
+                        <tr>
+                            <td>{{ .Id }}</td>
+                            <td>{{ .Name }}</td>
+                            <td>{{ .Email }}</td>
+                            <td>Edit | Delete</td>
+                        </tr>
+                    {{ end }}
                 </tbody>
             </table>
 

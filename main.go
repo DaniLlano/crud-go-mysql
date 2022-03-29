@@ -12,8 +12,8 @@ import (
 
 func conectDB() (connect *sql.DB) {
 	Driver := "mysql"
-	User := "root"
-	Password := ""
+	User := "dani"
+	Password := "Rycbar123!"
 	Name := "crud"
 
 	connect, err := sql.Open(Driver, User+":"+Password+"@tcp(127.0.0.1)/"+Name)
@@ -66,7 +66,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(newUser)
 
 	// fmt.Fprintf(w, "Holi")
-	templates.ExecuteTemplate(w, "home", nil)
+	templates.ExecuteTemplate(w, "home", newUser)
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
