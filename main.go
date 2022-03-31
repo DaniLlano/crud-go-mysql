@@ -11,7 +11,7 @@ import (
 
 func conectDB() (connect *sql.DB) {
 	Driver := "mysql"
-	User := ""
+	User := "root"
 	Password := ""
 	Name := "crud"
 
@@ -29,6 +29,8 @@ func main() {
 	http.HandleFunc("/create", Create)
 	http.HandleFunc("/insert", Insert)
 	http.HandleFunc("/delete", Delete)
+	http.HandleFunc("/edit", Edit)
+	http.HandleFunc("/update", Update)
 
 	log.Print("Server running")
 	http.ListenAndServe(":8080", nil)
@@ -42,7 +44,7 @@ type User struct {
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	connectionEstablished := conectDB()
-	register, err := connectionEstablished.Query("SELECT * FROM users")
+	registers, err := connectionEstablished.Query("SELECT * FROM users")
 
 	if err != nil {
 		panic(err.Error())
@@ -50,10 +52,10 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	user := User{}
 	newUser := []User{}
 
-	for register.Next() {
+	for registers.Next() {
 		var id int
 		var name, email string
-		err = register.Scan(&id, &name, &email)
+		err = registers.Scan(&id, &name, &email)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -64,7 +66,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		newUser = append(newUser, user)
 	}
 
-	// fmt.Fprintf(w, "Holi")
 	templates.ExecuteTemplate(w, "home", newUser)
 }
 
@@ -102,4 +103,46 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	deleteRegister.Exec(idUser)
 
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+}
+
+func Edit(w http.ResponseWriter, r *http.Request) {
+	idUser := r.URL.Query().Get("id")
+
+	connectionEstablished := conectDB()
+	register, err := connectionEstablished.Query("SELECT * FROM users WHERE id=?", idUser)
+
+	user := User{}
+
+	for register.Next() {
+		var id int
+		var name, email string
+		err = register.Scan(&id, &name, &email)
+		if err != nil {
+			panic(err.Error())
+		}
+		user.Id = id
+		user.Name = name
+		user.Email = email
+	}
+
+	templates.ExecuteTemplate(w, "update", user)
+}
+
+func Update(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		id := r.FormValue(("id"))
+		name := r.FormValue("name")
+		email := r.FormValue("email")
+
+		connectionEstablished := conectDB()
+		updateRegister, err := connectionEstablished.Prepare("UPDATE users SET name=?, email=? WHERE id=?")
+
+		if err != nil {
+			panic(err.Error())
+		}
+		updateRegister.Exec(name, email, id)
+
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+
+	}
 }
